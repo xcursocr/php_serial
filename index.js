@@ -25,6 +25,7 @@ app.get('/leer/:puerto', (req, res) => {
     });
 
     puertoSerie.on('data', data => {
+            
         if(data){
 
             console.log(`Datos recibidos desde ${puerto}: ${data}`);
@@ -32,17 +33,38 @@ app.get('/leer/:puerto', (req, res) => {
             // Cerrar el puerto después de enviar la respuesta
             puertoSerie.close(err => {
                 if (err) {
-                    console.error(`Error al cerrar el puerto ${puerto}: ${err.message}`);
+                    // console.error(`Error al cerrar el puerto ${puerto}: ${err.message}`);
                 }
             });
+
         }
+        
+
     });
 
+
+    // puertoSerie.on('open', () => {
+    //     console.log(`Conexión establecida en ${puerto}`);
+    // });
+
     puertoSerie.on('error', err => {
-        console.error(`Error en el puerto ${puerto}: ${err.message}`);
-        res.status(500).json({ error: err.message });
+        // console.error(`Error en el puerto ${puerto}: ${err.message}`);
+        const json = [
+            {
+              "peso": '00.00',
+            }
+            
+        ]
+        console.log(json[0].peso);
+        res.status(500).json(json[0].peso);
     });
+    
+
+   
 });
+
+
+
 
 
 // Inicia el servidor
