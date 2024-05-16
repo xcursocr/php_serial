@@ -1,10 +1,16 @@
 {
+  "name": "sys_bascula_gonzalez",
+  "version": "1.0.0",
+  "description": "Sistema de Basculas | Gonza Technology",
+  "main": "index.js",
   "scripts": {
     "start": "node --watch index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "serialport": "^12.0.0"
+    "nexe": "^4.0.0-rc.6",
+    "serialport": "^12.0.0",
+    "socket.io": "^4.7.5"
   }
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captura de datos del puerto serial</title>
+</head>
+<body>
+
+  <h1>Datos del puerto serial</h1>
+  <label id="data-label"></label>
+
+
+  <!-- <ul id="data-container"></ul> -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+  <!-- <script>
+    const socket = io();
+
+    socket.on('serialData', data => {
+      const dataList = document.getElementById('data-container');
+      const newItem = document.createElement('li');
+      newItem.textContent = data;
+      dataList.appendChild(newItem);
+    });
+  </script> -->
+
+<script>
+  const socket = io();
+  const dataLabel = document.getElementById('data-label'); // Obtener la etiqueta donde se mostrarán los datos
+
+  socket.on('serialData', data => {
+    dataLabel.textContent = data; // Actualizar el contenido de la etiqueta con los nuevos datos
+  });
+</script>
+
+
+</body>
+</html>

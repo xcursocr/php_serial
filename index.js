@@ -1,74 +1,36 @@
 const express = require('express');
-const { SerialPort } = require('serialport');
-const cors = require('cors');
+const {SerialPort} = require('serialport');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
 
 const app = express();
-// Habilitar CORS para todas las rutas
-app.use(cors());
+const port = 3000;
 
-// Ruta para obtener los puertos COM disponibles
-app.get('/puertos', (req, res) => {
-    SerialPort.list().then(ports => {
-        res.json(ports);
-    }).catch(err => {
-        res.status(500).json({ error: err.message });
-    });
+const serialPort = new SerialPort({path: 'COM4', baudRate: 9600 }); // Cambia 'COM3' por el nombre de tu puerto serial
+
+// Crear servidor HTTP
+const server = http.createServer(app);
+const io = socketIo(server);
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
 
-/// Ruta para leer desde un puerto COM específico
-app.get('/leer/:puerto', (req, res) => {
-    const puerto = req.params.puerto;
-    const puertoSerie = new SerialPort({ path: puerto, baudRate: 9600 });
-
-    puertoSerie.on('open', () => {
-        console.log(`Conexión establecida en ${puerto}`);
-    });
-
-    puertoSerie.on('data', data => {
-            
-        if(data){
-
-            console.log(`Datos recibidos desde ${puerto}: ${data}`);
-            res.send(data.toString());
-            // Cerrar el puerto después de enviar la respuesta
-            puertoSerie.close(err => {
-                if (err) {
-                    // console.error(`Error al cerrar el puerto ${puerto}: ${err.message}`);
-                }
-            });
-
-        }
-        
-
-    });
-
-
-    // puertoSerie.on('open', () => {
-    //     console.log(`Conexión establecida en ${puerto}`);
-    // });
-
-    puertoSerie.on('error', err => {
-        // console.error(`Error en el puerto ${puerto}: ${err.message}`);
-        const json = [
-            {
-              "peso": '00.00',
-            }
-            
-        ]
-        console.log(json[0].peso);
-        res.status(500).json(json[0].peso);
-    });
-    
-
-   
+serialPort.on('open', () => {
+  console.log('Conexión establecida con el puerto serial.');
 });
 
+serialPort.on('data', data => {
+  console.log('Datos recibidos:', data.toString());
+  io.emit('serialData', data.toString()); // Enviar datos a todos los clientes conectados
+});
 
+// Configurar WebSocket
+io.on('connection', socket => {
+  console.log('Cliente conectado');
+});
 
-
-
-// Inicia el servidor
-const portNumber = 3000; // Puerto en el que se ejecutará la API
-app.listen(portNumber, () => {
-  console.log(`Servidor escuchando en el puerto ${portNumber}`);
+server.listen(port, () => {
+  console.log(`Aplicación web corriendo en http://localhost:${port}`);
 });
